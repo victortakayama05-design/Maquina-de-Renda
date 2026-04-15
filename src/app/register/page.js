@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 import "../globals.css";
 
 export default function Register() {
@@ -14,18 +16,43 @@ export default function Register() {
     companyName: ""
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulating registration
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 1500);
+    setErrorMsg("");
+
+    try {
+      const supabase = createClient();
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+            document_type: formData.docType,
+            document: formData.document,
+            company_name: formData.companyName
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      window.location.href = '/dashboard/billing'; 
+      
+    } catch (error) {
+      console.error(error);
+      setErrorMsg(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,6 +69,12 @@ export default function Register() {
             Configure seu ambiente de afiliação automatizado.
           </p>
         </div>
+
+        {errorMsg && (
+          <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--error)', borderRadius: '8px', color: 'var(--error)', marginBottom: '24px', fontSize: '14px', textAlign: 'center' }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleRegister}>
           <div className="form-group">

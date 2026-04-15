@@ -2,20 +2,38 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulating login
-    setTimeout(() => {
-      // route to dashboard
-      window.location.href = "/dashboard";
-    }, 1500);
+    setErrorMsg("");
+    
+    try {
+      const supabase = createClient();
+      
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      
+      router.push("/dashboard");
+    } catch (error) {
+      console.error(error);
+      setErrorMsg("Credenciais inválidas. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,6 +54,12 @@ export default function Login() {
             Entre na sua Máquina de Renda
           </p>
         </div>
+
+        {errorMsg && (
+          <div style={{ padding: '12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--error)', borderRadius: '8px', color: 'var(--error)', marginBottom: '24px', fontSize: '14px', textAlign: 'center' }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
           <div className="form-group">
