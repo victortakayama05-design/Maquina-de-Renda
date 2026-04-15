@@ -30,7 +30,11 @@ export default function Login() {
       router.push("/dashboard");
     } catch (error) {
       console.error(error);
-      setErrorMsg("Credenciais inválidas. Tente novamente.");
+      if (error.message.includes("Email not confirmed")) {
+        setErrorMsg("Por favor, verifique sua caixa de entrada e confirme seu email antes de logar.");
+      } else {
+        setErrorMsg(error.message || "Credenciais inválidas. Tente novamente.");
+      }
     } finally {
       setIsLoading(false);
     }
