@@ -26,7 +26,7 @@ export default function DashboardHome() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
           <h1 style={{ fontSize: '28px', marginBottom: '8px' }}>Painel Central de Agentes</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Visão geral da sua operação "Máquina de Renda"</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Visão geral da sua operação &quot;Máquina de Renda&quot;</p>
         </div>
         <div style={{ padding: '8px 16px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '20px', color: 'var(--success)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--success)' }}></div>

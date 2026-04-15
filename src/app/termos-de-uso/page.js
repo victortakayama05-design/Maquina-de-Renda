@@ -34,7 +34,7 @@ export default function TermosDeUso() {
 
           <h2 style={{ color: 'var(--text-primary)', fontSize: '20px', marginTop: '24px', marginBottom: '12px' }}>4. Propriedade Intelectual</h2>
           <p style={{ marginBottom: '16px' }}>
-            Todo o fluxo de automação (workflows), design da plataforma e os prompts base que compõem o "Cérebro Central" são propriedade exclusiva da Máquina de Renda. A assinatura concede acesso de uso como serviço (SaaS), e de forma alguma transfere a propriedade do código-fonte ou workflows.
+            Todo o fluxo de automação (workflows), design da plataforma e os prompts base que compõem o &quot;Cérebro Central&quot; são propriedade exclusiva da Máquina de Renda. A assinatura concede acesso de uso como serviço (SaaS), e de forma alguma transfere a propriedade do código-fonte ou workflows.
           </p>
         </div>
 

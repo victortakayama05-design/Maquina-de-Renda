@@ -28,7 +28,7 @@ export default function TermosDeServico() {
           
           <h2 style={{ color: 'var(--text-primary)', fontSize: '20px', marginTop: '24px', marginBottom: '12px' }}>4. Disponibilidade (SLA)</h2>
           <p style={{ marginBottom: '16px' }}>
-            Trabalhamos para manter o "Cérebro Central" ativo 99.9% do tempo. Eventuais instabilidades nas engrenagens (APIs oficiais da Meta ou OpenAI) fogem ao escopo tecnológico da nossa operação, sendo o suporte nestes casos limitado a instruções de estabilização.
+            Trabalhamos para manter o &quot;Cérebro Central&quot; ativo 99.9% do tempo. Eventuais instabilidades nas engrenagens (APIs oficiais da Meta ou OpenAI) fogem ao escopo tecnológico da nossa operação, sendo o suporte nestes casos limitado a instruções de estabilização.
           </p>
         </div>
 
