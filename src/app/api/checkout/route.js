@@ -27,8 +27,12 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
+    const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || "price_1TMwUND8EK0K9tZ4ORS7Q37R";
     
+    if (!priceId) {
+      return NextResponse.json({ error: 'Erro de precificação: Price ID não encontrado no servidor.' }, { status: 400 });
+    }
+
     // Create Stripe customer
     const customer = await stripe.customers.create({
       email: session.user.email,

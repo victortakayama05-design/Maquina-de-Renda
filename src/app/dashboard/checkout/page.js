@@ -53,7 +53,7 @@ export default function CustomCheckout() {
       
       <div style={{ textAlign: 'center', marginBottom: '40px' }}>
         <h1 style={{ fontSize: '32px', marginBottom: '8px', color: '#ffffff' }}>
-          Checkout <span style={{ color: 'var(--primary)' }}>NeuroOps.ai</span>
+          Checkout <span style={{ color: 'var(--primary)' }}>Máquina de Renda</span>
         </h1>
         <p style={{ color: 'var(--text-secondary)' }}>
           Complete seu pagamento com segurança sem sair da plataforma. Processado por Stripe.
