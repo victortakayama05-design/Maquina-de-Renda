@@ -59,16 +59,19 @@ export default async function BillingPage() {
                 <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Integração com Stripe e IA Padrão liberados.</span>
               </>
             ) : (
-              <div style={{ padding: '4px 12px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--error)', borderRadius: '20px', color: 'var(--error)', fontSize: '12px', fontWeight: 600 }}>Inativo</div>
+              <>
+                <div style={{ padding: '4px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '20px', color: 'var(--success)', fontSize: '12px', fontWeight: 600 }}>Ativo</div>
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Acesso básico liberado.</span>
+              </>
             )}
           </div>
         </div>
         
         <div style={{ textAlign: 'right' }}>
-          <h2 style={{ fontSize: '32px' }}>R$ 497<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
+          <h2 style={{ fontSize: '32px' }}>{isElite ? 'R$ 497' : 'R$ 0'}<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
           {!isElite && (
             <Link href="/dashboard/checkout">
-              <button className="btn-primary" style={{ marginTop: '12px' }}>Assinar Agora (Checkout)</button>
+              <button className="btn-primary" style={{ marginTop: '12px' }}>Fazer Upgrade (R$ 497)</button>
             </Link>
           )}
         </div>
