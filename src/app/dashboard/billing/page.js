@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 
 export default function BillingPage() {
   return (
@@ -19,8 +20,10 @@ export default function BillingPage() {
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <h2 style={{ fontSize: '32px' }}>R$ 197<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
-          <button className="btn-secondary" style={{ marginTop: '12px' }}>Gerenciar Assinatura (Stripe)</button>
+          <h2 style={{ fontSize: '32px' }}>R$ 497<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
+          <Link href="/dashboard/checkout">
+            <button className="btn-primary" style={{ marginTop: '12px' }}>Assinar Agora (Checkout)</button>
+          </Link>
         </div>
       </div>
 
