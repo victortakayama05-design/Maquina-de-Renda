@@ -27,8 +27,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
-    const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || "price_1TMwUND8EK0K9tZ4ORS7Q37R";
+    const body = await request.json().catch(() => ({}));
+    const planKey = body.plan || 'elite'; // Default to elite if none provided
     
+    let priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ELITE || 'price_1TMyqRD8EK0K9tZ4dXI9aFRp';
+    
+    if (planKey === 'starter') {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || 'price_1TMyqQD8EK0K9tZ4lZQai6Bx';
+    } else if (planKey === 'pro') {
+      priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'price_1TMyqSD8EK0K9tZ4Rnctygzf';
+    }
+
     if (!priceId) {
       return NextResponse.json({ error: 'Erro de precificação: Price ID não encontrado no servidor.' }, { status: 400 });
     }

@@ -1,25 +1,64 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from 'next/link';
 
 export default function DashboardHome() {
-  const [stats, setStats] = useState({
+  const [profile, setProfile] = useState({ planTier: 'free', subscriptionStatus: 'none' });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(r => r.json())
+      .then(data => {
+        if(data && data.planTier) {
+          setProfile(data);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+  const stats = {
     leads: 124,
     vendas: "R$ 4.590",
     conversao: "3.2%",
     status: "Operando",
-  });
+  };
 
   const agents = [
-    { name: "🔥 Closer", desc: "Vendas 24/7", status: "online", lastAction: "2 min atrás" },
-    { name: "✍️ Creator", desc: "Scripts Reels", status: "online", lastAction: "Hoje, 05:30" },
-    { name: "🎬 Video Avatar", desc: "Produção HeyGen", status: "waiting", lastAction: "Agendado 18:00" },
-    { name: "🛡️ Guardian", desc: "Compliance", status: "online", lastAction: "15 min atrás" },
-    { name: "📤 Publisher", desc: "Postagem Redes", status: "online", lastAction: "Hoje, 14:00" },
-    { name: "🎯 Hunter", desc: "Captura Leads", status: "online", lastAction: "Agora" },
-    { name: "💬 Nurture", desc: "Reativação Frios", status: "waiting", lastAction: "Aguardando 10:30" },
-    { name: "📊 Analyst", desc: "Métricas", status: "waiting", lastAction: "Agendado 21:00" },
+    { id: 'closer', name: "🔥 Closer", desc: "Vendas 24/7", status: "online", lastAction: "2 min atrás", requiredPlan: 'starter' },
+    { id: 'creator', name: "✍️ Creator", desc: "Scripts Reels", status: "online", lastAction: "Hoje, 05:30", requiredPlan: 'elite' },
+    { id: 'video', name: "🎬 Video Avatar", desc: "Produção HeyGen", status: "waiting", lastAction: "Agendado 18:00", requiredPlan: 'elite' },
+    { id: 'guardian', name: "🛡️ Guardian", desc: "Compliance", status: "online", lastAction: "15 min atrás", requiredPlan: 'elite' },
+    { id: 'publisher', name: "📤 Publisher", desc: "Postagem Redes", status: "online", lastAction: "Hoje, 14:00", requiredPlan: 'elite' },
+    { id: 'hunter', name: "🎯 Hunter", desc: "Captura Leads", status: "online", lastAction: "Agora", requiredPlan: 'elite' },
+    { id: 'nurture', name: "💬 Nurture", desc: "Reativação Frios", status: "waiting", lastAction: "Aguardando 10:30", requiredPlan: 'elite' },
+    { id: 'analyst', name: "📊 Analyst", desc: "Métricas", status: "waiting", lastAction: "Agendado 21:00", requiredPlan: 'elite' },
   ];
+
+  const planHierachy = {
+    'free': 0,
+    'starter': 1,
+    'elite': 2,
+    'pro': 3
+  };
+
+  const currentLevel = planHierachy[profile.planTier] || 0;
+
+  const planNames = {
+    free: 'Plano Grátis',
+    starter: 'Starter Vendas',
+    elite: 'Afiliado Elite',
+    pro: 'Agência Pro'
+  };
+
+  if (loading) {
+    return <div className="animate-fade-in" style={{ padding: '40px', color: 'var(--text-secondary)' }}>Carregando central de operações...</div>;
+  }
 
   return (
     <div className="animate-fade-in">
@@ -48,35 +87,54 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      <h2 style={{ fontSize: '20px', marginBottom: '20px' }}>Equipe de Agentes (Afiliado Elite)</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2 style={{ fontSize: '20px' }}>Equipe de Agentes ({planNames[profile.planTier]})</h2>
+        {currentLevel < 2 && (
+          <Link href="/dashboard/plans">
+            <button className="btn-secondary" style={{ fontSize: '12px', padding: '6px 12px' }}>Liberar Todos os Agentes</button>
+          </Link>
+        )}
+      </div>
       
       {/* Agents Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-        {agents.map((agent, index) => (
-          <div key={index} className="glass-panel" style={{ padding: '20px', transition: 'transform 0.2s ease' }} 
-            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'} 
-            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-              <div>
-                <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>{agent.name}</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{agent.desc}</p>
+        {agents.map((agent, index) => {
+          const isLocked = planHierachy[agent.requiredPlan] > currentLevel;
+          const agentStatus = isLocked ? 'locked' : agent.status;
+
+          return (
+            <div key={index} className="glass-panel" style={{ 
+              padding: '20px', 
+              transition: 'transform 0.2s ease',
+              opacity: isLocked ? 0.5 : 1,
+              filter: isLocked ? 'grayscale(100%)' : 'none'
+            }} 
+              onMouseOver={(e) => { if(!isLocked) e.currentTarget.style.transform = 'translateY(-4px)' }} 
+              onMouseOut={(e) => { if(!isLocked) e.currentTarget.style.transform = 'translateY(0)' }}>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <div>
+                  <h3 style={{ fontSize: '16px', marginBottom: '4px' }}>{agent.name} {isLocked && '🔒'}</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{agent.desc}</p>
+                </div>
+                <div style={{ 
+                  width: '10px', 
+                  height: '10px', 
+                  borderRadius: '50%', 
+                  background: agentStatus === 'online' ? 'var(--success)' : (agentStatus === 'locked' ? 'var(--error)' : 'var(--text-secondary)'),
+                  boxShadow: agentStatus === 'online' ? '0 0 10px var(--success)' : 'none'
+                }}></div>
               </div>
-              <div style={{ 
-                width: '10px', 
-                height: '10px', 
-                borderRadius: '50%', 
-                background: agent.status === 'online' ? 'var(--success)' : 'var(--text-secondary)',
-                boxShadow: agent.status === 'online' ? '0 0 10px var(--success)' : 'none'
-              }}></div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', paddingTop: '16px', marginTop: '16px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{isLocked ? 'Requer upgrade:' : 'Última ação:'}</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: isLocked ? 'var(--primary)' : 'inherit' }}>
+                  {isLocked ? `Plano ${planNames[agent.requiredPlan]}` : agent.lastAction}
+                </span>
+              </div>
             </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--glass-border)', paddingTop: '16px', marginTop: '16px' }}>
-              <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Última ação:</span>
-              <span style={{ fontSize: '12px', fontWeight: 500 }}>{agent.lastAction}</span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useState } from 'react';
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ buttonText }) {
   const stripe = useStripe();
   const elements = useElements();
   const [errorMessage, setErrorMessage] = useState(null);
@@ -51,7 +51,7 @@ export default function CheckoutForm() {
         }}
       >
         <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner">Processando...</div> : "PAGAR R$ 497,00"}
+          {isLoading ? <div className="spinner" id="spinner">Processando...</div> : (buttonText || "PAGAR")}
         </span>
       </button>
       {errorMessage && <div id="payment-message" style={{ color: 'var(--error)', marginTop: '16px', fontSize: '14px', textAlign: 'center' }}>{errorMessage}</div>}

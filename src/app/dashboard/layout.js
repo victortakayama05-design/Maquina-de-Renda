@@ -2,10 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import "../globals.css";
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
+  const [profile, setProfile] = useState({ planTier: 'free', subscriptionStatus: 'none' });
+
+  useEffect(() => {
+    fetch('/api/profile')
+      .then(r => r.json())
+      .then(data => {
+        if(data && data.planTier) {
+          setProfile(data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   const navItems = [
     { name: "Painel de Agentes", path: "/dashboard" },
@@ -13,6 +26,15 @@ export default function DashboardLayout({ children }) {
     { name: "Perfil do Usuário", path: "/dashboard/profile" },
     { name: "Cobrança", path: "/dashboard/billing" },
   ];
+
+  const planNames = {
+    free: 'Plano Grátis',
+    starter: 'Starter Vendas',
+    elite: 'Afiliado Elite',
+    pro: 'Agência Pro'
+  };
+
+  const isActiveSub = profile.subscriptionStatus === 'active';
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--background)' }}>
@@ -58,9 +80,15 @@ export default function DashboardLayout({ children }) {
 
         <div style={{ padding: '0 24px' }}>
           <div style={{ padding: '16px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Afiliado Elite</p>
-            <p style={{ margin: 0, fontSize: '12px', color: 'var(--success)' }}>Ativo</p>
-            <button className="btn-secondary" style={{ width: '100%', marginTop: '12px', padding: '8px' }}>Sair</button>
+            <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: 'var(--primary)' }}>
+              {planNames[profile.planTier] || 'Plano Grátis'}
+            </p>
+            <p style={{ margin: 0, fontSize: '12px', color: isActiveSub ? 'var(--success)' : 'var(--text-secondary)' }}>
+              {isActiveSub ? 'Ativo' : 'Grátis Limitado'}
+            </p>
+            <Link href="/dashboard/plans">
+              <button className="btn-secondary" style={{ width: '100%', marginTop: '12px', padding: '8px', fontSize: '12px' }}>Ver Planos</button>
+            </Link>
           </div>
         </div>
       </aside>

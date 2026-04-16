@@ -1,20 +1,33 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import { useSearchParams } from "next/navigation";
 import CheckoutForm from "@/components/CheckoutForm";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
-export default function CustomCheckout() {
+function CheckoutContent() {
+  const searchParams = useSearchParams();
+  const planKey = searchParams.get('plan') || 'elite';
+  
   const [clientSecret, setClientSecret] = useState("");
   const [loadingMsg, setLoadingMsg] = useState("Preparando túnel seguro...");
+
+  // Determine plane names and prices for UI
+  const planDetails = {
+    starter: { name: 'Starter Vendas', price: 'R$ 97,00' },
+    elite: { name: 'Afiliado Elite', price: 'R$ 197,00' },
+    pro: { name: 'Agência Pro', price: 'R$ 497,00' },
+  };
+  const currentPlan = planDetails[planKey] || planDetails['elite'];
 
   useEffect(() => {
     fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: planKey })
     })
       .then((res) => res.json())
       .then((data) => {
@@ -28,7 +41,7 @@ export default function CustomCheckout() {
         setLoadingMsg("Erro de conexão com o banco de dados.");
         console.error(err);
       });
-  }, []);
+  }, [planKey]);
 
   const appearance = {
     theme: 'night',
@@ -66,7 +79,7 @@ export default function CustomCheckout() {
         <div className="glass-panel" style={{ flex: '1 1 500px', padding: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <h2 style={{ fontSize: '20px' }}>Dados do Pagamento</h2>
-            <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Powered by Stripe</span>
+            {/* Removed the 'Powered by Stripe' text per user request */}
           </div>
 
           {!clientSecret ? (
@@ -75,7 +88,7 @@ export default function CustomCheckout() {
             </div>
           ) : (
             <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm />
+              <CheckoutForm buttonText={`PAGAR ${currentPlan.price}`} />
             </Elements>
           )}
         </div>
@@ -86,22 +99,30 @@ export default function CustomCheckout() {
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '16px' }}>
             <span style={{ color: 'var(--text-secondary)' }}>Serviço</span>
-            <span style={{ fontWeight: 600 }}>Plano Recorrente: Starter</span>
+            <span style={{ fontWeight: 600 }}>{currentPlan.name}</span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
             <span style={{ fontWeight: 700, fontSize: '18px' }}>Total</span>
-            <span style={{ fontWeight: 700, fontSize: '24px', color: 'var(--primary)' }}>R$ 497,00</span>
+            <span style={{ fontWeight: 700, fontSize: '24px', color: 'var(--primary)' }}>{currentPlan.price}</span>
           </div>
 
           <div style={{ padding: '16px', background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '8px' }}>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-              🔒 Ambiente seguro via Stripe. Sua assinatura será renovada automaticamente no modo Teste.
+              🔒 Ambiente seguro via Stripe. Sua assinatura será renovada automaticamente conforme o plano selecionado.
             </p>
           </div>
         </div>
 
       </div>
     </div>
+  );
+}
+
+export default function CustomCheckout() {
+  return (
+    <Suspense fallback={<div>Carregando checkout seguro...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

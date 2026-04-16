@@ -70,8 +70,8 @@ export default async function BillingPage() {
         <div style={{ textAlign: 'right' }}>
           <h2 style={{ fontSize: '32px' }}>{isElite ? 'R$ 497' : 'R$ 0'}<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
           {!isElite && (
-            <Link href="/dashboard/checkout">
-              <button className="btn-primary" style={{ marginTop: '12px' }}>Fazer Upgrade (R$ 497)</button>
+            <Link href="/dashboard/plans">
+              <button className="btn-primary" style={{ marginTop: '12px' }}>Fazer Upgrade</button>
             </Link>
           )}
         </div>
