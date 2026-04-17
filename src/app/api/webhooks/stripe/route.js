@@ -62,16 +62,17 @@ export async function POST(req) {
           
           console.log(`[WEBHOOK] Iniciando update do Supabase para user ${supabaseUUID} com plano ${resolvedPlanTier}`);
           
-          // Atualiza a tabela profiles
+          // Atualiza ou Cria a tabela profiles (caso o gatilho on_auth_user_created tenha falhado)
           const { error: dbError } = await supabase
             .from('profiles')
-            .update({
+            .upsert({
+              id: supabaseUUID,
               plan_tier: resolvedPlanTier,
               stripe_customer_id: customerId,
               stripe_subscription_id: subscriptionId,
-              subscription_status: 'active'
-            })
-            .eq('id', supabaseUUID);
+              subscription_status: 'active',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'id' });
             
           if (dbError) {
             console.error('[WEBHOOK] Erro CRÍTICO ao atualizar supabase db:', dbError);

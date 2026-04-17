@@ -33,7 +33,16 @@ export default async function BillingPage() {
     }
   }
 
-  const isElite = planTier === 'elite' && subscriptionStatus === 'active';
+  const isPaid = subscriptionStatus === 'active' && planTier !== 'free';
+
+  const planDetails = {
+    'free': { name: 'Plano Gratuito (Limitado)', price: '0', desc: 'Você precisa assinar para liberar robôs e operações multicanal.' },
+    'starter': { name: 'Starter Vendas', price: '97', desc: 'Agentes focados em captação e nutrição automatizada.' },
+    'elite': { name: 'Afiliado Elite', price: '197', desc: 'Operação multicanal para vendas orgânicas via WhatsApp.' },
+    'pro': { name: 'Agência Pro', price: '497', desc: 'War Room completo e sem limites para operação em grande escala.' }
+  };
+
+  const currentPlan = planDetails[planTier] || planDetails['free'];
 
   return (
     <div className="animate-fade-in">
@@ -46,17 +55,17 @@ export default async function BillingPage() {
       <div className="glass-panel" style={{ padding: '32px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ fontSize: '20px', marginBottom: '4px', color: 'var(--primary)' }}>
-            {isElite ? 'Plano Afiliado Elite' : 'Plano Gratuito (Limitado)'}
+            {currentPlan.name}
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-            {isElite ? 'Operação multicanal para vendas orgânicas via WhatsApp' : 'Você precisa assinar para liberar robôs e operações multicanal.'}
+            {currentPlan.desc}
           </p>
           
           <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {isElite ? (
+            {isPaid ? (
               <>
                 <div style={{ padding: '4px 12px', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '20px', color: 'var(--success)', fontSize: '12px', fontWeight: 600 }}>Ativo</div>
-                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Integração com Stripe e IA Padrão liberados.</span>
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Integração avançada e robôs liberados.</span>
               </>
             ) : (
               <>
@@ -68,8 +77,8 @@ export default async function BillingPage() {
         </div>
         
         <div style={{ textAlign: 'right' }}>
-          <h2 style={{ fontSize: '32px' }}>{isElite ? 'R$ 497' : 'R$ 0'}<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
-          {!isElite && (
+          <h2 style={{ fontSize: '32px' }}>R$ {currentPlan.price}<span style={{ fontSize: '16px', color: 'var(--text-secondary)' }}>/mês</span></h2>
+          {!isPaid && (
             <Link href="/dashboard/plans">
               <button className="btn-primary" style={{ marginTop: '12px' }}>Fazer Upgrade</button>
             </Link>
