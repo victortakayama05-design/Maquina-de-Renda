@@ -99,7 +99,7 @@ export default async function BillingPage() {
           </div>
           
           <div style={{ padding: '32px', textAlign: 'center', fontSize: '13px', color: 'var(--text-secondary)' }}>
-            {isElite ? 'Faturas recentes via Stripe aparecerão em breve.' : 'Nenhuma assinatura ativa encontrada no seu perfil.'}
+            {isPaid ? 'Faturas recentes via Stripe aparecerão em breve.' : 'Nenhuma assinatura ativa encontrada no seu perfil.'}
           </div>
         </div>
       </div>
