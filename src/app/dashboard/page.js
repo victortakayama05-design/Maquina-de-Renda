@@ -30,7 +30,7 @@ export default function DashboardHome() {
   };
 
   const agents = [
-    { id: 'closer', name: "🔥 Closer", desc: "Vendas 24/7", status: "online", lastAction: "2 min atrás", requiredPlan: 'starter' },
+    { id: 'closer', name: "🔥 Closer", desc: "Vendas 24/7", status: "online", lastAction: "2 min atrás", requiredPlan: 'free' },
     { id: 'creator', name: "✍️ Creator", desc: "Scripts Reels", status: "online", lastAction: "Hoje, 05:30", requiredPlan: 'elite' },
     { id: 'video', name: "🎬 Video Avatar", desc: "Produção HeyGen", status: "waiting", lastAction: "Agendado 18:00", requiredPlan: 'elite' },
     { id: 'guardian', name: "🛡️ Guardian", desc: "Compliance", status: "online", lastAction: "15 min atrás", requiredPlan: 'elite' },

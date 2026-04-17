@@ -43,18 +43,33 @@ export async function POST(req) {
         const supabaseUUID = customer.metadata.supabaseUUID;
 
         if (supabaseUUID) {
-          // Atualiza a tabela profiles com o nível e customer_id
-          await supabase
+          // Extrair o Price ID da fatura para saber qual plano foi assinado
+          const lineItems = invoice.lines?.data || [];
+          const priceId = lineItems[0]?.price?.id;
+          
+          let resolvedPlanTier = 'elite'; // Default fallback
+          if (priceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || 'price_1TMyqQD8EK0K9tZ4lZQai6Bx')) {
+            resolvedPlanTier = 'starter';
+          } else if (priceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'price_1TMyqSD8EK0K9tZ4Rnctygzf')) {
+            resolvedPlanTier = 'pro';
+          }
+          
+          // Atualiza a tabela profiles com o nível alcançado e ids do cliente
+          const { error: dbError } = await supabase
             .from('profiles')
             .update({
-              plan_tier: 'elite',
+              plan_tier: resolvedPlanTier,
               stripe_customer_id: customerId,
               stripe_subscription_id: subscriptionId,
               subscription_status: 'active'
             })
             .eq('id', supabaseUUID);
             
-          console.log(`[WEBHOOK] Cliente ativo: ${supabaseUUID}`);
+          if (dbError) {
+            console.error('[WEBHOOK] Erro ao atualizar supabase db:', dbError);
+          } else {
+            console.log(`[WEBHOOK] Cliente ativo promovido para ${resolvedPlanTier}: ${supabaseUUID}`);
+          }
         }
         break;
       }
