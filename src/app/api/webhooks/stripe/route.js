@@ -40,21 +40,29 @@ export async function POST(req) {
         
         // Puxa UUID do cliente salvo no webhook metadata (ou via API Customer)
         const customer = await stripe.customers.retrieve(customerId);
-        const supabaseUUID = customer.metadata.supabaseUUID;
+        const supabaseUUID = customer.metadata?.supabaseUUID;
 
         if (supabaseUUID) {
-          // Extrair o Price ID da fatura para saber qual plano foi assinado
+          // Extrair o Price ID da fatura
           const lineItems = invoice.lines?.data || [];
           const priceId = lineItems[0]?.price?.id;
           
-          let resolvedPlanTier = 'elite'; // Default fallback
-          if (priceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || 'price_1TMyqQD8EK0K9tZ4lZQai6Bx')) {
-            resolvedPlanTier = 'starter';
-          } else if (priceId === (process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO || 'price_1TMyqSD8EK0K9tZ4Rnctygzf')) {
-            resolvedPlanTier = 'pro';
+          let resolvedPlanTier = 'elite';
+          
+          if (priceId) {
+            try {
+              const priceObj = await stripe.prices.retrieve(priceId);
+              if (priceObj.metadata && priceObj.metadata.tier) {
+                resolvedPlanTier = priceObj.metadata.tier;
+              }
+            } catch(e) {
+              console.log('[WEBHOOK] Nao consegui ler os metadados do preco:', e.message);
+            }
           }
           
-          // Atualiza a tabela profiles com o nível alcançado e ids do cliente
+          console.log(`[WEBHOOK] Iniciando update do Supabase para user ${supabaseUUID} com plano ${resolvedPlanTier}`);
+          
+          // Atualiza a tabela profiles
           const { error: dbError } = await supabase
             .from('profiles')
             .update({
@@ -66,10 +74,12 @@ export async function POST(req) {
             .eq('id', supabaseUUID);
             
           if (dbError) {
-            console.error('[WEBHOOK] Erro ao atualizar supabase db:', dbError);
+            console.error('[WEBHOOK] Erro CRÍTICO ao atualizar supabase db:', dbError);
           } else {
-            console.log(`[WEBHOOK] Cliente ativo promovido para ${resolvedPlanTier}: ${supabaseUUID}`);
+            console.log(`[WEBHOOK] Sucesso absoluto! Cliente promovido para ${resolvedPlanTier}: ${supabaseUUID}`);
           }
+        } else {
+          console.error('[WEBHOOK] ERRO: Fatura não contém metadata supabaseUUID atrelada ao Customer!');
         }
         break;
       }
